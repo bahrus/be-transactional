@@ -63,7 +63,7 @@ export class BeTransactionalController {
 }
 const tagName = 'be-transactional';
 const ifWantsToBe = 'transactional';
-const upgrade = 'template';
+const upgrade = '*';
 define({
     config: {
         tagName,
@@ -71,7 +71,12 @@ define({
             ifWantsToBe,
             upgrade,
             noParse: true,
+            intro: 'intro',
+            virtualProps: [],
         }
+    },
+    complexPropDefaults: {
+        controller: BeTransactionalController
     }
 });
 register(ifWantsToBe, upgrade, tagName);

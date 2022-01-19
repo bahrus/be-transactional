@@ -75,7 +75,7 @@ const tagName = 'be-transactional';
 
 const ifWantsToBe = 'transactional';
 
-const upgrade = 'template';
+const upgrade = '*';
 
 define<BeTransactionalProps & BeDecoratedProps<BeTransactionalProps, BeTransactionalActions>>({
     config: {
@@ -84,7 +84,12 @@ define<BeTransactionalProps & BeDecoratedProps<BeTransactionalProps, BeTransacti
             ifWantsToBe,
             upgrade,
             noParse: true,
+            intro: 'intro',
+            virtualProps:[],
         }
+    },
+    complexPropDefaults: {
+        controller: BeTransactionalController
     }
 });
 

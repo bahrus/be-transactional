@@ -6,8 +6,6 @@ import {mergeDeep} from 'trans-render/lib/mergeDeep.js';
 
 const guid = 'dngmX6Rkq0SEOT4Iqu7fCQ==';
 
-//const propSubscribers = new WeakMap<Element, {[key: string]: string}>();
-
 export class BeTransactionalController implements BeTransactionalActions{
     #target!: Element;
     async intro(proxy: Element & BeTransactionalVirtualProps, target: Element, beDecorProps: BeDecoratedProps){
@@ -23,12 +21,6 @@ export class BeTransactionalController implements BeTransactionalActions{
     }
 
     hookUp(path: string, propKey: string){
-        // if(!propSubscribers.has(this.#target)){
-        //     propSubscribers.set(this.#target, {});
-        // }
-        // const subscribers = propSubscribers.get(this.#target)!;
-        // if(subscribers[propKey] === undefined){
-        //     subscribers[propKey] = path;
         let proto = this.#target;
         let prop: PropertyDescriptor | undefined = Object.getOwnPropertyDescriptor(proto, propKey);
         while(proto && !prop){
@@ -45,27 +37,29 @@ export class BeTransactionalController implements BeTransactionalActions{
                 return getter();
             },
             set(nv){
-                //const observers = propSubscribers.get(this.#target)![propKey];
                 setter(nv);
-                const aWin = window as any;
-                const appHistory = aWin.appHistory as AppHistory;
-                const current = appHistory.current?.getState() as any;
-                const objToMerge = {} as any;
-                let cursor = objToMerge;
-                const split = path.split('.');
-                for(let i = 0, ii = split.length; i < ii; i++){
-                    if(i === ii - 1){
-                        cursor[split[i]] = nv;
-                    }else{
-                        const newObj = {} as any;
-                        cursor[split[i]] = newObj;
-                        cursor = newObj;
+                requestIdleCallback(() => {
+                    const aWin = window as any;
+                    const appHistory = aWin.appHistory as AppHistory;
+                    const current = appHistory.current?.getState() as any;
+                    const objToMerge = {} as any;
+                    let cursor = objToMerge;
+                    const split = path.split('.');
+                    for(let i = 0, ii = split.length; i < ii; i++){
+                        if(i === ii - 1){
+                            cursor[split[i]] = nv;
+                        }else{
+                            const newObj = {} as any;
+                            cursor[split[i]] = newObj;
+                            cursor = newObj;
+                        }
                     }
-                }
-                const state = mergeDeep(current, objToMerge);
-                appHistory.updateCurrent({
-                    state
-                });
+                    const state = mergeDeep(current, objToMerge);
+                    appHistory.updateCurrent({
+                        state
+                    });
+                })
+
             },
             enumerable: true,
             configurable: true 

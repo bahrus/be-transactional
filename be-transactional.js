@@ -2,7 +2,6 @@ import { define } from 'be-decorated/be-decorated.js';
 import { register } from 'be-hive/register.js';
 import { mergeDeep } from 'trans-render/lib/mergeDeep.js';
 const guid = 'dngmX6Rkq0SEOT4Iqu7fCQ==';
-//const propSubscribers = new WeakMap<Element, {[key: string]: string}>();
 export class BeTransactionalController {
     #target;
     async intro(proxy, target, beDecorProps) {
@@ -17,12 +16,6 @@ export class BeTransactionalController {
         }
     }
     hookUp(path, propKey) {
-        // if(!propSubscribers.has(this.#target)){
-        //     propSubscribers.set(this.#target, {});
-        // }
-        // const subscribers = propSubscribers.get(this.#target)!;
-        // if(subscribers[propKey] === undefined){
-        //     subscribers[propKey] = path;
         let proto = this.#target;
         let prop = Object.getOwnPropertyDescriptor(proto, propKey);
         while (proto && !prop) {
@@ -39,27 +32,28 @@ export class BeTransactionalController {
                 return getter();
             },
             set(nv) {
-                //const observers = propSubscribers.get(this.#target)![propKey];
                 setter(nv);
-                const aWin = window;
-                const appHistory = aWin.appHistory;
-                const current = appHistory.current?.getState();
-                const objToMerge = {};
-                let cursor = objToMerge;
-                const split = path.split('.');
-                for (let i = 0, ii = split.length; i < ii; i++) {
-                    if (i === ii - 1) {
-                        cursor[split[i]] = nv;
+                requestIdleCallback(() => {
+                    const aWin = window;
+                    const appHistory = aWin.appHistory;
+                    const current = appHistory.current?.getState();
+                    const objToMerge = {};
+                    let cursor = objToMerge;
+                    const split = path.split('.');
+                    for (let i = 0, ii = split.length; i < ii; i++) {
+                        if (i === ii - 1) {
+                            cursor[split[i]] = nv;
+                        }
+                        else {
+                            const newObj = {};
+                            cursor[split[i]] = newObj;
+                            cursor = newObj;
+                        }
                     }
-                    else {
-                        const newObj = {};
-                        cursor[split[i]] = newObj;
-                        cursor = newObj;
-                    }
-                }
-                const state = mergeDeep(current, objToMerge);
-                appHistory.updateCurrent({
-                    state
+                    const state = mergeDeep(current, objToMerge);
+                    appHistory.updateCurrent({
+                        state
+                    });
                 });
             },
             enumerable: true,

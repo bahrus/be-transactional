@@ -1,6 +1,6 @@
 {
   "name": "be-transactional",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "keywords": [
     "web-components",
     "web-component",
@@ -13,11 +13,11 @@
   "description": "Use appHistory as a trade blotter, providing a kind of global state unifier across components.",
   "main": "be-transactional.js",
   "module": "be-transactional.js",
-  "exports":{
+  "exports": {
     ".": "./be-transactional.js",
     "./be-transactional.js": "./be-transactional.js"
   },
-  "dependencies":{
+  "dependencies": {
     "trans-render": "0.0.445",
     "be-decorated": "0.0.62",
     "be-hive": "0.0.17"
@@ -27,7 +27,9 @@
     "@skypack/package-check": "0.2.2",
     "@custom-elements-manifest/analyzer": "0.5.7"
   },
-  "files":["*.*"],
+  "files": [
+    "*.*"
+  ],
   "types": "types.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

@@ -1,5 +1,7 @@
 # be-transactional
 
+Use appHistory as a "trade blotter", providing a kind of global state unifier across components.
+
 ```html
 <cotus-house be-transactional='{
     "impeachmentCount": "cotus.house.impeachmentCount",

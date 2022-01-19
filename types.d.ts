@@ -9,5 +9,5 @@ export interface BeTransactionalProps extends BeTransactionalVirtualProps{
 }
 
 export interface BeTransactionalActions{
-    
+    intro(proxy: Element & BeTransactionalVirtualProps, target: Element, beDecorProps: BeDecoratedProps): void;
 }

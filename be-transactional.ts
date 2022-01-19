@@ -41,7 +41,7 @@ export class BeTransactionalController implements BeTransactionalActions{
                 requestIdleCallback(() => {
                     const aWin = window as any;
                     const appHistory = aWin.appHistory as AppHistory;
-                    const current = appHistory.current?.getState() as any;
+                    const current = appHistory.current?.getState() || {} as any;
                     const objToMerge = {} as any;
                     let cursor = objToMerge;
                     const split = path.split('.');

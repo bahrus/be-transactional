@@ -36,7 +36,7 @@ export class BeTransactionalController {
                 requestIdleCallback(() => {
                     const aWin = window;
                     const appHistory = aWin.appHistory;
-                    const current = appHistory.current?.getState();
+                    const current = appHistory.current?.getState() || {};
                     const objToMerge = {};
                     let cursor = objToMerge;
                     const split = path.split('.');

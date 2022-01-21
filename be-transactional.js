@@ -1,6 +1,7 @@
 import { define } from 'be-decorated/be-decorated.js';
 import { register } from 'be-hive/register.js';
 import { mergeDeep } from 'trans-render/lib/mergeDeep.js';
+import { subscribe } from 'trans-render/lib/subscribe.js';
 const guid = 'dngmX6Rkq0SEOT4Iqu7fCQ==';
 export class BeTransactionalController {
     #target;
@@ -13,51 +14,36 @@ export class BeTransactionalController {
         for (const propKey in propPathMap) {
             const path = propPathMap[propKey];
             this.hookUp(path, propKey);
+            this.updateHistory(path, propKey, target[propKey]);
         }
     }
+    updateHistory(path, propKey, nv) {
+        requestIdleCallback(() => {
+            const aWin = window;
+            const appHistory = aWin.appHistory;
+            const current = appHistory.current?.getState() || {};
+            const objToMerge = {};
+            let cursor = objToMerge;
+            const split = path.split('.');
+            for (let i = 0, ii = split.length; i < ii; i++) {
+                if (i === ii - 1) {
+                    cursor[split[i]] = nv;
+                }
+                else {
+                    const newObj = {};
+                    cursor[split[i]] = newObj;
+                    cursor = newObj;
+                }
+            }
+            const state = mergeDeep(current, objToMerge);
+            appHistory.updateCurrent({
+                state
+            });
+        });
+    }
     hookUp(path, propKey) {
-        let proto = this.#target;
-        let prop = Object.getOwnPropertyDescriptor(proto, propKey);
-        while (proto && !prop) {
-            proto = Object.getPrototypeOf(proto);
-            prop = Object.getOwnPropertyDescriptor(proto, propKey);
-        }
-        if (prop === undefined) {
-            throw { target: this.#target, propKey, message: "Can't find property." };
-        }
-        const setter = prop.set.bind(this.#target);
-        const getter = prop.get.bind(this.#target);
-        Object.defineProperty(this.#target, propKey, {
-            get() {
-                return getter();
-            },
-            set(nv) {
-                setter(nv);
-                requestIdleCallback(() => {
-                    const aWin = window;
-                    const appHistory = aWin.appHistory;
-                    const current = appHistory.current?.getState() || {};
-                    const objToMerge = {};
-                    let cursor = objToMerge;
-                    const split = path.split('.');
-                    for (let i = 0, ii = split.length; i < ii; i++) {
-                        if (i === ii - 1) {
-                            cursor[split[i]] = nv;
-                        }
-                        else {
-                            const newObj = {};
-                            cursor[split[i]] = newObj;
-                            cursor = newObj;
-                        }
-                    }
-                    const state = mergeDeep(current, objToMerge);
-                    appHistory.updateCurrent({
-                        state
-                    });
-                });
-            },
-            enumerable: true,
-            configurable: true
+        subscribe(this.#target, propKey, (element, propKey, nv) => {
+            this.updateHistory(path, propKey, nv);
         });
     }
 }

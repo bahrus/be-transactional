@@ -1,7 +1,7 @@
 import { define } from 'be-decorated/be-decorated.js';
 import { register } from 'be-hive/register.js';
 import { mergeDeep } from 'trans-render/lib/mergeDeep.js';
-import { subscribe } from 'trans-render/lib/subscribe.js';
+import { subscribe, unsubscribe } from 'trans-render/lib/subscribe.js';
 const guid = 'dngmX6Rkq0SEOT4Iqu7fCQ==';
 export class BeTransactionalController {
     #target;
@@ -16,6 +16,9 @@ export class BeTransactionalController {
             this.hookUp(path, propKey);
             this.updateHistory(path, propKey, target[propKey]);
         }
+    }
+    intro(proxy, target, beDecorProps) {
+        unsubscribe(proxy);
     }
     updateHistory(path, propKey, nv) {
         requestIdleCallback(() => {

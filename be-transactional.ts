@@ -3,7 +3,7 @@ import {BeTransactionalVirtualProps, BeTransactionalActions, BeTransactionalProp
 import {register} from 'be-hive/register.js';
 import {AppHistory} from './appHistory';
 import {mergeDeep} from 'trans-render/lib/mergeDeep.js';
-import {subscribe} from 'trans-render/lib/subscribe.js';
+import {subscribe, unsubscribe} from 'trans-render/lib/subscribe.js';
 
 const guid = 'dngmX6Rkq0SEOT4Iqu7fCQ==';
 
@@ -20,6 +20,10 @@ export class BeTransactionalController implements BeTransactionalActions{
             this.hookUp(path, propKey);
             this.updateHistory(path, propKey, (<any>target)[propKey]);
         }   
+    }
+
+    intro(proxy: Element & BeTransactionalVirtualProps, target: Element, beDecorProps: BeDecoratedProps){
+        unsubscribe(proxy);
     }
 
     updateHistory(path: string, propKey: string, nv: any){

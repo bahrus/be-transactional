@@ -17,8 +17,8 @@ export class BeTransactionalController {
             this.updateHistory(path, propKey, target[propKey]);
         }
     }
-    intro(proxy, target, beDecorProps) {
-        unsubscribe(proxy);
+    finale(proxy, target, beDecorProps) {
+        unsubscribe(target);
     }
     updateHistory(path, propKey, nv) {
         requestIdleCallback(() => {

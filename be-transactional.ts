@@ -7,6 +7,8 @@ import {subscribe, unsubscribe} from 'trans-render/lib/subscribe.js';
 
 const guid = 'dngmX6Rkq0SEOT4Iqu7fCQ==';
 
+declare function requestIdleCallback(callback: () => void): void;
+
 export class BeTransactionalController implements BeTransactionalActions{
     #target!: Element;
     async intro(proxy: Element & BeTransactionalVirtualProps, target: Element, beDecorProps: BeDecoratedProps){
@@ -22,8 +24,8 @@ export class BeTransactionalController implements BeTransactionalActions{
         }   
     }
 
-    intro(proxy: Element & BeTransactionalVirtualProps, target: Element, beDecorProps: BeDecoratedProps){
-        unsubscribe(proxy);
+    finale(proxy: Element & BeTransactionalVirtualProps, target: Element, beDecorProps: BeDecoratedProps){
+        unsubscribe(target);
     }
 
     updateHistory(path: string, propKey: string, nv: any){
@@ -47,7 +49,7 @@ export class BeTransactionalController implements BeTransactionalActions{
             appHistory.updateCurrent({
                 state
             });
-        })
+        });
     }
 
     hookUp(path: string, propKey: string){

@@ -29,7 +29,7 @@ export class BeTransactionalController implements BeTransactionalActions{
     }
 
     updateHistory(path: string, propKey: string, nv: any){
-        requestIdleCallback(() => {
+        requestIdleCallback(() => { //TODO:  queue changes?
             const aWin = window as any;
             const appHistory = aWin.appHistory as AppHistory;
             const current = appHistory.current?.getState() || {} as any;

@@ -2,10 +2,7 @@ import {BeDecoratedProps, define} from 'be-decorated/be-decorated.js';
 import {BeTransactionalVirtualProps, BeTransactionalActions, BeTransactionalProps} from './types';
 import {register} from 'be-hive/register.js';
 import {AppHistory} from './appHistory';
-import {mergeDeep} from 'trans-render/lib/mergeDeep.js';
-import {subscribe, unsubscribe} from 'trans-render/lib/subscribe.js';
 
-const guid = 'dngmX6Rkq0SEOT4Iqu7fCQ==';
 
 declare function requestIdleCallback(callback: () => void): void;
 
@@ -19,17 +16,18 @@ export class BeTransactionalController implements BeTransactionalActions{
         const propPathMap = JSON.parse(proxy.getAttribute('is-' + beDecorProps.ifWantsToBe!)!);
         for(const propKey in propPathMap){
             const path = propPathMap[propKey] as string;
-            this.hookUp(path, propKey);
-            this.updateHistory(path, propKey, (<any>target)[propKey]);
+            await this.hookUp(path, propKey);
+            await this.updateHistory(path, propKey, (<any>target)[propKey]);
         }   
     }
 
-    finale(proxy: Element & BeTransactionalVirtualProps, target: Element, beDecorProps: BeDecoratedProps){
+    async finale(proxy: Element & BeTransactionalVirtualProps, target: Element, beDecorProps: BeDecoratedProps){
+        const {unsubscribe} = await import('trans-render/lib/subscribe.js');
         unsubscribe(target);
     }
 
-    updateHistory(path: string, propKey: string, nv: any){
-        requestIdleCallback(() => { //TODO:  queue changes?
+    async updateHistory(path: string, propKey: string, nv: any){
+        requestIdleCallback(async () => { //TODO:  queue changes?
             const aWin = window as any;
             const appHistory = aWin.appHistory as AppHistory;
             const current = appHistory.current?.getState() || {} as any;
@@ -45,6 +43,7 @@ export class BeTransactionalController implements BeTransactionalActions{
                     cursor = newObj;
                 }
             }
+            const {mergeDeep} = await import('trans-render/lib/mergeDeep.js');
             const state = mergeDeep(current, objToMerge);
             appHistory.updateCurrent({
                 state
@@ -52,7 +51,8 @@ export class BeTransactionalController implements BeTransactionalActions{
         });
     }
 
-    hookUp(path: string, propKey: string){
+    async hookUp(path: string, propKey: string){
+        const {subscribe} = await import('trans-render/lib/subscribe.js');
         subscribe(this.#target, propKey, (element: Element, propKey: string, nv: any) => {
             this.updateHistory(path, propKey, nv);
         });

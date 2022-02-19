@@ -1,8 +1,5 @@
 import { define } from 'be-decorated/be-decorated.js';
 import { register } from 'be-hive/register.js';
-import { mergeDeep } from 'trans-render/lib/mergeDeep.js';
-import { subscribe, unsubscribe } from 'trans-render/lib/subscribe.js';
-const guid = 'dngmX6Rkq0SEOT4Iqu7fCQ==';
 export class BeTransactionalController {
     #target;
     async intro(proxy, target, beDecorProps) {
@@ -13,15 +10,16 @@ export class BeTransactionalController {
         const propPathMap = JSON.parse(proxy.getAttribute('is-' + beDecorProps.ifWantsToBe));
         for (const propKey in propPathMap) {
             const path = propPathMap[propKey];
-            this.hookUp(path, propKey);
-            this.updateHistory(path, propKey, target[propKey]);
+            await this.hookUp(path, propKey);
+            await this.updateHistory(path, propKey, target[propKey]);
         }
     }
-    finale(proxy, target, beDecorProps) {
+    async finale(proxy, target, beDecorProps) {
+        const { unsubscribe } = await import('trans-render/lib/subscribe.js');
         unsubscribe(target);
     }
-    updateHistory(path, propKey, nv) {
-        requestIdleCallback(() => {
+    async updateHistory(path, propKey, nv) {
+        requestIdleCallback(async () => {
             const aWin = window;
             const appHistory = aWin.appHistory;
             const current = appHistory.current?.getState() || {};
@@ -38,13 +36,15 @@ export class BeTransactionalController {
                     cursor = newObj;
                 }
             }
+            const { mergeDeep } = await import('trans-render/lib/mergeDeep.js');
             const state = mergeDeep(current, objToMerge);
             appHistory.updateCurrent({
                 state
             });
         });
     }
-    hookUp(path, propKey) {
+    async hookUp(path, propKey) {
+        const { subscribe } = await import('trans-render/lib/subscribe.js');
         subscribe(this.#target, propKey, (element, propKey, nv) => {
             this.updateHistory(path, propKey, nv);
         });

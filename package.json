@@ -18,9 +18,9 @@
     "./be-transactional.js": "./be-transactional.js"
   },
   "dependencies": {
-    "trans-render": "0.0.510",
-    "be-decorated": "0.0.88",
-    "be-hive": "0.0.35"
+    "trans-render": "0.0.511",
+    "be-decorated": "0.0.89",
+    "be-hive": "0.0.36"
   },
   "devDependencies": {
     "xtal-test": "0.0.55",

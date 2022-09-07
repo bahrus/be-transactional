@@ -18,7 +18,7 @@ export class BeTransactionalController {
         const { unsubscribe } = await import('trans-render/lib/subscribe.js');
         unsubscribe(target);
     }
-    async updateHistory(path, propKey, nv) {
+    async updateHistory(path, propKey, newValue) {
         requestIdleCallback(async () => {
             const aWin = window;
             const navigation = aWin.navigation;
@@ -28,7 +28,7 @@ export class BeTransactionalController {
             const split = path.split('.');
             for (let i = 0, ii = split.length; i < ii; i++) {
                 if (i === ii - 1) {
-                    cursor[split[i]] = nv;
+                    cursor[split[i]] = newValue;
                 }
                 else {
                     const newObj = {};
@@ -39,7 +39,7 @@ export class BeTransactionalController {
             const { mergeDeep } = await import('trans-render/lib/mergeDeep.js');
             const state = mergeDeep(current, objToMerge);
             //https://developer.chrome.com/docs/web-platform/navigation-api/#setting-state
-            navigation.navigate(location.href, { state, history: 'replace', info: { mergedObject: objToMerge } });
+            navigation.navigate(location.href, { state, history: 'replace', info: { mergedObject: objToMerge, path, newValue } });
         });
     }
     async hookUp(path, propKey) {

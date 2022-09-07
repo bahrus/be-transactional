@@ -26,7 +26,7 @@ export class BeTransactionalController implements BeTransactionalActions{
         unsubscribe(target);
     }
 
-    async updateHistory(path: string, propKey: string, nv: any){
+    async updateHistory(path: string, propKey: string, newValue: any){
         requestIdleCallback(async () => { //TODO:  queue changes?
             const aWin = window as any;
             const navigation = aWin.navigation as Navigation;
@@ -36,7 +36,7 @@ export class BeTransactionalController implements BeTransactionalActions{
             const split = path.split('.');
             for(let i = 0, ii = split.length; i < ii; i++){
                 if(i === ii - 1){
-                    cursor[split[i]] = nv;
+                    cursor[split[i]] = newValue;
                 }else{
                     const newObj = {} as any;
                     cursor[split[i]] = newObj;
@@ -46,7 +46,7 @@ export class BeTransactionalController implements BeTransactionalActions{
             const {mergeDeep} = await import('trans-render/lib/mergeDeep.js');
             const state = mergeDeep(current, objToMerge);
             //https://developer.chrome.com/docs/web-platform/navigation-api/#setting-state
-            navigation.navigate(location.href, {state, history: 'replace', info: {mergedObject: objToMerge}});
+            navigation.navigate(location.href, {state, history: 'replace', info: {mergedObject: objToMerge, path, newValue}});
         });
     }
 

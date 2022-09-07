@@ -1,14 +1,14 @@
 import {BeDecoratedProps, define} from 'be-decorated/be-decorated.js';
-import {BeTransactionalVirtualProps, BeTransactionalActions, BeTransactionalProps} from './types';
+import {VirtualProps, BeTransactionalActions, ProxyProps, Proxy} from './types';
 import {register} from 'be-hive/register.js';
-import {AppHistory} from './appHistory';
+import {Navigation} from './navigation_api';
 
 
 declare function requestIdleCallback(callback: () => void): void;
 
 export class BeTransactionalController implements BeTransactionalActions{
     #target!: Element;
-    async intro(proxy: Element & BeTransactionalVirtualProps, target: Element, beDecorProps: BeDecoratedProps){
+    async intro(proxy: Proxy, target: Element, beDecorProps: BeDecoratedProps){
         this.#target = target;
         if(target.localName.includes('-')){
             await customElements.whenDefined(target.localName);
@@ -21,7 +21,7 @@ export class BeTransactionalController implements BeTransactionalActions{
         }   
     }
 
-    async finale(proxy: Element & BeTransactionalVirtualProps, target: Element, beDecorProps: BeDecoratedProps){
+    async finale(proxy: Proxy, target: Element, beDecorProps: BeDecoratedProps){
         const {unsubscribe} = await import('trans-render/lib/subscribe.js');
         unsubscribe(target);
     }
@@ -29,8 +29,8 @@ export class BeTransactionalController implements BeTransactionalActions{
     async updateHistory(path: string, propKey: string, nv: any){
         requestIdleCallback(async () => { //TODO:  queue changes?
             const aWin = window as any;
-            const appHistory = aWin.appHistory as AppHistory;
-            const current = appHistory.current?.getState() || {} as any;
+            const navigation = aWin.navigation as Navigation;
+            const current = navigation.currentEntry?.getState() || {} as any;
             const objToMerge = {} as any;
             let cursor = objToMerge;
             const split = path.split('.');
@@ -45,9 +45,8 @@ export class BeTransactionalController implements BeTransactionalActions{
             }
             const {mergeDeep} = await import('trans-render/lib/mergeDeep.js');
             const state = mergeDeep(current, objToMerge);
-            appHistory.updateCurrent({
-                state
-            });
+            //https://developer.chrome.com/docs/web-platform/navigation-api/#setting-state
+            navigation.navigate(location.href, {state, history: 'replace', info: {mergedObject: objToMerge}});
         });
     }
 
@@ -59,7 +58,7 @@ export class BeTransactionalController implements BeTransactionalActions{
     }
 }
 
-export interface BeTransactionalController extends BeTransactionalProps{}
+export interface BeTransactionalController extends ProxyProps{}
 
 const tagName = 'be-transactional';
 
@@ -67,7 +66,7 @@ const ifWantsToBe = 'transactional';
 
 const upgrade = '*';
 
-define<BeTransactionalProps & BeDecoratedProps<BeTransactionalProps, BeTransactionalActions>>({
+define<ProxyProps & BeDecoratedProps<ProxyProps, BeTransactionalActions>>({
     config: {
         tagName,
         propDefaults:{

@@ -1,14 +1,18 @@
-import {BeDecoratedProps} from 'be-decorated/types';
+import {BeDecoratedProps, MinimalProxy} from 'be-decorated/types';
 
-export interface BeTransactionalVirtualProps{
+export interface EndUserProps {}
+
+export interface VirtualProps extends EndUserProps, MinimalProxy{
 
 }
 
-export interface BeTransactionalProps extends BeTransactionalVirtualProps{
-    proxy: Element & BeTransactionalVirtualProps;
+export type Proxy = Element & VirtualProps;
+
+export interface ProxyProps extends VirtualProps{
+    proxy: Proxy;
 }
 
 export interface BeTransactionalActions{
-    intro(proxy: Element & BeTransactionalVirtualProps, target: Element, beDecorProps: BeDecoratedProps): void;
-    finale(proxy: Element & BeTransactionalVirtualProps, target: Element, beDecorProps: BeDecoratedProps): void;
+    intro(proxy: Proxy, target: Element, beDecorProps: BeDecoratedProps): void;
+    finale(proxy: Proxy, target: Element, beDecorProps: BeDecoratedProps): void;
 }

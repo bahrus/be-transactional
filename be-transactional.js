@@ -21,8 +21,8 @@ export class BeTransactionalController {
     async updateHistory(path, propKey, nv) {
         requestIdleCallback(async () => {
             const aWin = window;
-            const appHistory = aWin.appHistory;
-            const current = appHistory.current?.getState() || {};
+            const navigation = aWin.navigation;
+            const current = navigation.currentEntry?.getState() || {};
             const objToMerge = {};
             let cursor = objToMerge;
             const split = path.split('.');
@@ -38,9 +38,8 @@ export class BeTransactionalController {
             }
             const { mergeDeep } = await import('trans-render/lib/mergeDeep.js');
             const state = mergeDeep(current, objToMerge);
-            appHistory.updateCurrent({
-                state
-            });
+            //https://developer.chrome.com/docs/web-platform/navigation-api/#setting-state
+            navigation.navigate(location.href, { state, history: 'replace', info: { mergedObject: objToMerge } });
         });
     }
     async hookUp(path, propKey) {

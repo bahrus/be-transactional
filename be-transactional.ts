@@ -7,18 +7,31 @@ import {Navigation} from './navigation_api';
 declare function requestIdleCallback(callback: () => void): void;
 
 export class BeTransactionalController implements BeTransactionalActions{
-    #target!: Element;
+    #controllers: AbortController[] = [];
     async intro(proxy: Proxy, target: Element, beDecorProps: BeDecoratedProps){
-        this.#target = target;
-        if(target.localName.includes('-')){
-            await customElements.whenDefined(target.localName);
+        let params: any = undefined;
+        const attr = proxy.getAttribute('is-' + beDecorProps.ifWantsToBe!)!;
+        try{
+            params = JSON.parse(attr);
+        }catch(e){
+            console.error({
+                e,
+                attr
+            });
+            return;
         }
-        const propPathMap = JSON.parse(proxy.getAttribute('is-' + beDecorProps.ifWantsToBe!)!);
-        for(const propKey in propPathMap){
-            const path = propPathMap[propKey] as string;
-            await this.hookUp(path, propKey);
-            await this.updateHistory(path, propKey, (<any>target)[propKey]);
-        }   
+        const {notifyHookup} =  await import('trans-render/lib/notifyHookup.js');
+        
+        this.#controllers = [];
+        for(const propKey in params){
+            const pram = params[propKey]
+        }
+        proxy.resolved = true;
+        // for(const propKey in propPathMap){
+        //     const path = propPathMap[propKey] as string;
+        //     await this.hookUp(path, propKey);
+        //     await this.updateHistory(path, propKey, (<any>target)[propKey]);
+        // }   
     }
 
     async finale(proxy: Proxy, target: Element, beDecorProps: BeDecoratedProps){
@@ -50,12 +63,12 @@ export class BeTransactionalController implements BeTransactionalActions{
         });
     }
 
-    async hookUp(path: string, propKey: string){
-        const {subscribe} = await import('trans-render/lib/subscribe.js');
-        subscribe(this.#target, propKey, (element: Element, propKey: string, nv: any) => {
-            this.updateHistory(path, propKey, nv);
-        });
-    }
+    // async hookUp(path: string, propKey: string){
+    //     const {subscribe} = await import('trans-render/lib/subscribe.js');
+    //     subscribe(this.#target, propKey, (element: Element, propKey: string, nv: any) => {
+    //         this.updateHistory(path, propKey, nv);
+    //     });
+    // }
 }
 
 export interface BeTransactionalController extends ProxyProps{}

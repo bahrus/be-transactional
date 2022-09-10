@@ -1,10 +1,21 @@
 # be-transactional
 
-Use appHistory as a "trade blotter", providing a kind of global state unifier across components.
+Use the Navigation API as a "trade blotter", providing a kind of global state unifier across components.
 
 ```html
 <cotus-house be-transactional='{
-    "impeachmentCount": "cotus.house.impeachmentCount",
+    "impeachmentCount:onSet": "cotus.house.impeachmentCount"
+}'cotus.house.impeachmentCount></cotus-house>
+```
+
+is shorthand for:
+
+```html
+<cotus-house be-transactional='{
+    "impeachmentCount:onSet": {
+        "path": "cotus.house.impeachmentCount",
+        "navType": "reload", //|'push'|'replace'|'traverse'
+    }
 }'></cotus-house>
 
 ...

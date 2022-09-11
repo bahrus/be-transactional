@@ -28,7 +28,7 @@ export class BeTransactionalController {
                 doOnly: async (target, key, mn, e) => {
                     const { getValFromEvent } = await import('trans-render/lib/getValFromEvent.js');
                     const pram = mn;
-                    const val = getValFromEvent(target, pram, e);
+                    const val = await getValFromEvent(target, pram, e);
                     await this.updateHistory(pram.path, val);
                 }
             } : pram;

@@ -2,6 +2,7 @@ import {BeDecoratedProps, define} from 'be-decorated/be-decorated.js';
 import {VirtualProps, BeTransactionalActions, ProxyProps, Proxy, ITransactionalParam} from './types';
 import {register} from 'be-hive/register.js';
 import {Navigation} from './navigation_api';
+import { IMinimalNotify } from 'trans-render/lib/types';
 
 
 declare function requestIdleCallback(callback: () => void): void;
@@ -31,13 +32,13 @@ export class BeTransactionalController implements BeTransactionalActions{
                 propName,
                 nudge: true,
                 path: pram,
-                doOnly: async (target, key, mn, e) => {
-                    const {getValFromEvent} = await import('trans-render/lib/getValFromEvent.js');
-                    const pram = mn as ITransactionalParam;
-                    const val = await getValFromEvent(target, pram, e);
-                    await this.updateHistory(pram.path, val);
-                }
             } as ITransactionalParam : pram;
+            notifyParam.doOnly = async (target: Element, key: string, mn: IMinimalNotify, e?: Event) => {
+                const {getValFromEvent} = await import('trans-render/lib/getValFromEvent.js');
+                const pram = mn as ITransactionalParam;
+                const val = await getValFromEvent(target, pram, e);
+                await this.updateHistory(pram.path, val);
+            };
             const handler = await notifyHookup(target, propKey, notifyParam);
             this.#controllers.push(handler.controller);
         }
@@ -79,7 +80,7 @@ export class BeTransactionalController implements BeTransactionalActions{
             const {mergeDeep} = await import('trans-render/lib/mergeDeep.js');
             const state = mergeDeep(current, objToMerge);
             //https://developer.chrome.com/docs/web-platform/navigation-api/#setting-state
-            navigation.navigate(location.href, {state, history: 'replace', info: {mergedObject: objToMerge, path, newValue}});
+            navigation.navigate(location.href + '#' + newValue, {state, history: 'push', info: {mergedObject: objToMerge, path, newValue}});
         });
     }
 

@@ -8,7 +8,10 @@
 </head>
 <body>
     <button be-counted be-transactional='{
-        "be-decorated.counted.value-changed": "a.b.c"
+        "be-decorated.counted.value-changed": {
+            "path": "a.b.c", 
+            "vft": "beDecorated.counted.value"
+        }
     }'>Count</button>
     <script type=importmap>
         {

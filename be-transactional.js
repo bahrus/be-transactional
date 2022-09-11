@@ -25,13 +25,13 @@ export class BeTransactionalController {
                 propName,
                 nudge: true,
                 path: pram,
-                doOnly: async (target, key, mn, e) => {
-                    const { getValFromEvent } = await import('trans-render/lib/getValFromEvent.js');
-                    const pram = mn;
-                    const val = await getValFromEvent(target, pram, e);
-                    await this.updateHistory(pram.path, val);
-                }
             } : pram;
+            notifyParam.doOnly = async (target, key, mn, e) => {
+                const { getValFromEvent } = await import('trans-render/lib/getValFromEvent.js');
+                const pram = mn;
+                const val = await getValFromEvent(target, pram, e);
+                await this.updateHistory(pram.path, val);
+            };
             const handler = await notifyHookup(target, propKey, notifyParam);
             this.#controllers.push(handler.controller);
         }
@@ -71,7 +71,7 @@ export class BeTransactionalController {
             const { mergeDeep } = await import('trans-render/lib/mergeDeep.js');
             const state = mergeDeep(current, objToMerge);
             //https://developer.chrome.com/docs/web-platform/navigation-api/#setting-state
-            navigation.navigate(location.href, { state, history: 'replace', info: { mergedObject: objToMerge, path, newValue } });
+            navigation.navigate(location.href + '#' + newValue, { state, history: 'push', info: { mergedObject: objToMerge, path, newValue } });
         });
     }
 }

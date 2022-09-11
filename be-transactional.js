@@ -3,7 +3,6 @@ import { register } from 'be-hive/register.js';
 const guid = '3a61e61d-6d36-4f7a-923d-baf3655def2c';
 const navigation = window.navigation;
 navigation.addEventListener('navigate', navigateEvent => {
-    console.log({ navigateEvent });
     if (navigateEvent?.info?.guid === guid) {
         navigateEvent.intercept({
             async handler() {
@@ -12,7 +11,6 @@ navigation.addEventListener('navigate', navigateEvent => {
         });
     }
 });
-//declare function requestIdleCallback(callback: () => void): void;
 export class BeTransactionalController {
     #controllers = [];
     async intro(proxy, target, beDecorProps) {
@@ -49,11 +47,6 @@ export class BeTransactionalController {
             this.#controllers.push(handler.controller);
         }
         proxy.resolved = true;
-        // for(const propKey in propPathMap){
-        //     const path = propPathMap[propKey] as string;
-        //     await this.hookUp(path, propKey);
-        //     await this.updateHistory(path, propKey, (<any>target)[propKey]);
-        // }   
     }
     disconnect() {
         for (const c of this.#controllers) {
@@ -82,16 +75,7 @@ export class BeTransactionalController {
             }
             const { mergeDeep } = await import('trans-render/lib/mergeDeep.js');
             const state = mergeDeep(current, mergeObject);
-            // const change: CurrentEntryChange = {
-            //     [guid]: {
-            //         path,
-            //         mergeObject,
-            //         newValue
-            //     }
-            // }
-            //Object.assign(state, change); //sigh
             //https://developer.chrome.com/docs/web-platform/navigation-api/#setting-state
-            //navigation.updateCurrentEntry({state});
             navigation.navigate(location.href, { history: 'replace', state, info: { path, mergeObject, newValue, guid } });
         });
     }

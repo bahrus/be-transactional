@@ -1,6 +1,17 @@
 import { define } from 'be-decorated/be-decorated.js';
 import { register } from 'be-hive/register.js';
 const guid = '3a61e61d-6d36-4f7a-923d-baf3655def2c';
+const navigation = window.navigation;
+navigation.addEventListener('navigate', navigateEvent => {
+    console.log({ navigateEvent });
+    if (navigateEvent?.info?.guid === guid) {
+        navigateEvent.intercept({
+            async handler() {
+                return undefined;
+            },
+        });
+    }
+});
 //declare function requestIdleCallback(callback: () => void): void;
 export class BeTransactionalController {
     #controllers = [];
@@ -55,7 +66,6 @@ export class BeTransactionalController {
     async updateHistory(path, newValue) {
         requestIdleCallback(async () => {
             const aWin = window;
-            const navigation = aWin.navigation;
             const current = navigation.currentEntry?.getState() || {};
             const mergeObject = {};
             let cursor = mergeObject;
@@ -72,16 +82,17 @@ export class BeTransactionalController {
             }
             const { mergeDeep } = await import('trans-render/lib/mergeDeep.js');
             const state = mergeDeep(current, mergeObject);
-            const change = {
-                [guid]: {
-                    path,
-                    mergeObject,
-                    newValue
-                }
-            };
-            Object.assign(state, change); //sigh
+            // const change: CurrentEntryChange = {
+            //     [guid]: {
+            //         path,
+            //         mergeObject,
+            //         newValue
+            //     }
+            // }
+            //Object.assign(state, change); //sigh
             //https://developer.chrome.com/docs/web-platform/navigation-api/#setting-state
-            navigation.updateCurrentEntry({ state });
+            //navigation.updateCurrentEntry({state});
+            navigation.navigate(location.href, { history: 'replace', state, info: { path, mergeObject, newValue, guid } });
         });
     }
 }

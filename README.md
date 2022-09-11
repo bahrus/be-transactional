@@ -14,13 +14,12 @@ is shorthand for:
 <cotus-house be-transactional='{
     "impeachmentCount:onSet": {
         "path": "cotus.house.impeachmentCount",
-        "propName": "impeachCount",
-        "navType": "reload", //|'push'|'replace'|'traverse'
+        "valueFromTarget": "impeachmentCount",
     }
 }'></cotus-house>
 
 ...
-<cotus-potus be-observant='{
+<cotus-potus be-current='{
     "impeachmentCount": {
         "observeAppHistory": "cotus.house.impeachmentCount",
         "linearTransform":{

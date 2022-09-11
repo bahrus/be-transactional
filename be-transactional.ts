@@ -5,6 +5,18 @@ import {Navigation} from './navigation_api';
 import { IMinimalNotify } from 'trans-render/lib/types';
 
 const guid = '3a61e61d-6d36-4f7a-923d-baf3655def2c';
+const navigation = (<any>window).navigation as Navigation;
+navigation.addEventListener('navigate', navigateEvent => {
+    console.log({navigateEvent});
+    if((<any>navigateEvent?.info)?.guid === guid){
+        navigateEvent.intercept({
+            async handler() {
+                return undefined;
+            },
+        });
+    }
+
+});
 
 //declare function requestIdleCallback(callback: () => void): void;
 
@@ -64,7 +76,7 @@ export class BeTransactionalController implements BeTransactionalActions{
     async updateHistory(path: string, newValue: any){
         requestIdleCallback(async () => { //TODO:  queue changes?
             const aWin = window as any;
-            const navigation = aWin.navigation as Navigation;
+            
             const current = navigation.currentEntry?.getState() || {} as any;
             const mergeObject = {} as any;
             let cursor = mergeObject;
@@ -80,16 +92,19 @@ export class BeTransactionalController implements BeTransactionalActions{
             }
             const {mergeDeep} = await import('trans-render/lib/mergeDeep.js');
             const state = mergeDeep(current, mergeObject);
-            const change: CurrentEntryChange = {
-                [guid]: {
-                    path,
-                    mergeObject,
-                    newValue
-                }
-            }
-            Object.assign(state, change); //sigh
+            // const change: CurrentEntryChange = {
+            //     [guid]: {
+            //         path,
+            //         mergeObject,
+            //         newValue
+            //     }
+            // }
+
+            //Object.assign(state, change); //sigh
             //https://developer.chrome.com/docs/web-platform/navigation-api/#setting-state
-            navigation.updateCurrentEntry({state});
+            //navigation.updateCurrentEntry({state});
+
+            navigation.navigate(location.href, {history: 'replace', state, info:{path, mergeObject, newValue, guid}})
         });
     }
 

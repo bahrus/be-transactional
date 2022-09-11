@@ -1,5 +1,5 @@
 import {BeDecoratedProps, define} from 'be-decorated/be-decorated.js';
-import {VirtualProps, BeTransactionalActions, ProxyProps, Proxy} from './types';
+import {VirtualProps, BeTransactionalActions, ProxyProps, Proxy, ITransactionalParam} from './types';
 import {register} from 'be-hive/register.js';
 import {Navigation} from './navigation_api';
 
@@ -24,7 +24,22 @@ export class BeTransactionalController implements BeTransactionalActions{
         
         this.#controllers = [];
         for(const propKey in params){
-            const pram = params[propKey]
+            const pram = params[propKey];
+            const isPropSet = propKey.endsWith(':onSet');
+            const propName = isPropSet ?  propKey.substr(0, propKey.length - 6) : undefined;
+            const notifyParam: ITransactionalParam = (typeof pram === 'string') ? {
+                propName,
+                nudge: true,
+                path: pram,
+                doOnly: async (target, key, mn, e) => {
+                    const {getValFromEvent} = await import('trans-render/lib/getValFromEvent.js');
+                    const pram = mn as ITransactionalParam;
+                    const val = getValFromEvent(target, pram, e);
+                    await this.updateHistory(pram.path, val);
+                }
+            } as ITransactionalParam : pram;
+            const handler = await notifyHookup(target, propKey, notifyParam);
+            this.#controllers.push(handler.controller);
         }
         proxy.resolved = true;
         // for(const propKey in propPathMap){
@@ -34,12 +49,17 @@ export class BeTransactionalController implements BeTransactionalActions{
         // }   
     }
 
-    async finale(proxy: Proxy, target: Element, beDecorProps: BeDecoratedProps){
-        const {unsubscribe} = await import('trans-render/lib/subscribe.js');
-        unsubscribe(target);
+    disconnect(){
+        for(const c of this.#controllers){
+            c.abort();
+        }
     }
 
-    async updateHistory(path: string, propKey: string, newValue: any){
+    async finale(proxy: Proxy, target: Element, beDecorProps: BeDecoratedProps){
+        this.disconnect();
+    }
+
+    async updateHistory(path: string, newValue: any){
         requestIdleCallback(async () => { //TODO:  queue changes?
             const aWin = window as any;
             const navigation = aWin.navigation as Navigation;

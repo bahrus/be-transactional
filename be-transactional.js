@@ -1,24 +1,56 @@
 import { define } from 'be-decorated/be-decorated.js';
 import { register } from 'be-hive/register.js';
 export class BeTransactionalController {
-    #target;
+    #controllers = [];
     async intro(proxy, target, beDecorProps) {
-        this.#target = target;
-        if (target.localName.includes('-')) {
-            await customElements.whenDefined(target.localName);
+        let params = undefined;
+        const attr = proxy.getAttribute('is-' + beDecorProps.ifWantsToBe);
+        try {
+            params = JSON.parse(attr);
         }
-        const propPathMap = JSON.parse(proxy.getAttribute('is-' + beDecorProps.ifWantsToBe));
-        for (const propKey in propPathMap) {
-            const path = propPathMap[propKey];
-            await this.hookUp(path, propKey);
-            await this.updateHistory(path, propKey, target[propKey]);
+        catch (e) {
+            console.error({
+                e,
+                attr
+            });
+            return;
+        }
+        const { notifyHookup } = await import('trans-render/lib/notifyHookup.js');
+        this.#controllers = [];
+        for (const propKey in params) {
+            const pram = params[propKey];
+            const isPropSet = propKey.endsWith(':onSet');
+            const propName = isPropSet ? propKey.substr(0, propKey.length - 6) : undefined;
+            const notifyParam = (typeof pram === 'string') ? {
+                propName,
+                nudge: true,
+                path: pram,
+                doOnly: async (target, key, mn, e) => {
+                    const { getValFromEvent } = await import('trans-render/lib/getValFromEvent.js');
+                    const pram = mn;
+                    const val = getValFromEvent(target, pram, e);
+                    await this.updateHistory(pram.path, val);
+                }
+            } : pram;
+            const handler = await notifyHookup(target, propKey, notifyParam);
+            this.#controllers.push(handler.controller);
+        }
+        proxy.resolved = true;
+        // for(const propKey in propPathMap){
+        //     const path = propPathMap[propKey] as string;
+        //     await this.hookUp(path, propKey);
+        //     await this.updateHistory(path, propKey, (<any>target)[propKey]);
+        // }   
+    }
+    disconnect() {
+        for (const c of this.#controllers) {
+            c.abort();
         }
     }
     async finale(proxy, target, beDecorProps) {
-        const { unsubscribe } = await import('trans-render/lib/subscribe.js');
-        unsubscribe(target);
+        this.disconnect();
     }
-    async updateHistory(path, propKey, newValue) {
+    async updateHistory(path, newValue) {
         requestIdleCallback(async () => {
             const aWin = window;
             const navigation = aWin.navigation;
@@ -40,12 +72,6 @@ export class BeTransactionalController {
             const state = mergeDeep(current, objToMerge);
             //https://developer.chrome.com/docs/web-platform/navigation-api/#setting-state
             navigation.navigate(location.href, { state, history: 'replace', info: { mergedObject: objToMerge, path, newValue } });
-        });
-    }
-    async hookUp(path, propKey) {
-        const { subscribe } = await import('trans-render/lib/subscribe.js');
-        subscribe(this.#target, propKey, (element, propKey, nv) => {
-            this.updateHistory(path, propKey, nv);
         });
     }
 }

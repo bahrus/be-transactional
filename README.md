@@ -14,7 +14,7 @@ is shorthand for:
 <cotus-house be-transactional='{
     "impeachmentCount:onSet": {
         "path": "cotus.house.impeachmentCount",
-        "valueFromTarget": "impeachCount",
+        "propName": "impeachCount",
         "navType": "reload", //|'push'|'replace'|'traverse'
     }
 }'></cotus-house>

@@ -20,12 +20,7 @@ is shorthand for:
 
 ...
 <cotus-potus be-current='{
-    "impeachmentCount": {
-        "observeAppHistory": "cotus.house.impeachmentCount",
-        "linearTransform":{
-            "m": 1,
-            "b": -4
-        }
-    }
+    "with": "cotus.house.impeachmentCount",
+    "set": "impeachmentCount"
 }'></cotus-potus>
 ```

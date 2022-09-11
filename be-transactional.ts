@@ -1,5 +1,5 @@
 import {BeDecoratedProps, define} from 'be-decorated/be-decorated.js';
-import {VirtualProps, BeTransactionalActions, ProxyProps, Proxy, ITransactionalParam} from './types';
+import {VirtualProps, BeTransactionalActions, ProxyProps, Proxy, ITransactionalParam, CurrentEntryChange} from './types';
 import {register} from 'be-hive/register.js';
 import {Navigation} from './navigation_api';
 import { IMinimalNotify } from 'trans-render/lib/types';
@@ -80,11 +80,14 @@ export class BeTransactionalController implements BeTransactionalActions{
             }
             const {mergeDeep} = await import('trans-render/lib/mergeDeep.js');
             const state = mergeDeep(current, mergeObject);
-            state[guid] = {
-                path,
-                mergeObject,
-                newValue,
-            }; //sigh
+            const change: CurrentEntryChange = {
+                [guid]: {
+                    path,
+                    mergeObject,
+                    newValue
+                }
+            }
+            Object.assign(state, change); //sigh
             //https://developer.chrome.com/docs/web-platform/navigation-api/#setting-state
             navigation.updateCurrentEntry({state});
         });

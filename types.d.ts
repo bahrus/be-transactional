@@ -21,3 +21,13 @@ export interface BeTransactionalActions{
 export interface ITransactionalParam extends IValFromEventInstructions, IDIYNotify{
     path: string,
 }
+
+export type guid = '3a61e61d-6d36-4f7a-923d-baf3655def2c';
+
+export interface CurrentEntryChange{
+    '3a61e61d-6d36-4f7a-923d-baf3655def2c': {
+        path: string,
+        mergeObject: unknown,
+        newValue: unknown
+    }
+}

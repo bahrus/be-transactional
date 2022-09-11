@@ -71,8 +71,7 @@ export class BeTransactionalController {
             const { mergeDeep } = await import('trans-render/lib/mergeDeep.js');
             const state = mergeDeep(current, objToMerge);
             //https://developer.chrome.com/docs/web-platform/navigation-api/#setting-state
-            //navigation.navigate(location.href + '#' + newValue, {state, history: 'push', info: {mergedObject: objToMerge, path, newValue}});
-            navigation.navigate(location.href, { state, history: 'replace', info: { mergedObject: objToMerge, path, newValue } });
+            navigation.updateCurrentEntry({ state, info: { mergedObject: objToMerge, path, newValue } });
         });
     }
 }

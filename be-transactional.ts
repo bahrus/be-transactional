@@ -80,17 +80,13 @@ export class BeTransactionalController implements BeTransactionalActions{
             const {mergeDeep} = await import('trans-render/lib/mergeDeep.js');
             const state = mergeDeep(current, objToMerge);
             //https://developer.chrome.com/docs/web-platform/navigation-api/#setting-state
-            //navigation.navigate(location.href + '#' + newValue, {state, history: 'push', info: {mergedObject: objToMerge, path, newValue}});
-            navigation.navigate(location.href, {state, history: 'replace', info: {mergedObject: objToMerge, path, newValue}});
+            navigation.updateCurrentEntry({state, info: {mergedObject: objToMerge, path, newValue}});
+            
+            
         });
     }
 
-    // async hookUp(path: string, propKey: string){
-    //     const {subscribe} = await import('trans-render/lib/subscribe.js');
-    //     subscribe(this.#target, propKey, (element: Element, propKey: string, nv: any) => {
-    //         this.updateHistory(path, propKey, nv);
-    //     });
-    // }
+
 }
 
 export interface BeTransactionalController extends ProxyProps{}

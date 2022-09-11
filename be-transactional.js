@@ -1,7 +1,17 @@
 import { define } from 'be-decorated/be-decorated.js';
 import { register } from 'be-hive/register.js';
-const guid = '3a61e61d-6d36-4f7a-923d-baf3655def2c';
+import { Hashit } from 'trans-render/lib/Hashit.js';
+const guidLHS = '3a61e61d-6d36-4f';
+const guidRHS = '7a-923d-baf3655def2c';
+const guid = guidLHS + guidRHS;
 const navigation = window.navigation;
+const hashit = new Hashit(guidLHS, guidRHS);
+if (navigation.currentEntry?.getState() === undefined) {
+    const state = hashit.parse('currentEntry');
+    if (state !== null) {
+        navigation.updateCurrentEntry({ state });
+    }
+}
 navigation.addEventListener('navigate', navigateEvent => {
     if (navigateEvent?.info?.guid === guid) {
         navigateEvent.intercept({
@@ -76,7 +86,9 @@ export class BeTransactionalController {
             const { mergeDeep } = await import('trans-render/lib/mergeDeep.js');
             const state = mergeDeep(current, mergeObject);
             //https://developer.chrome.com/docs/web-platform/navigation-api/#setting-state
-            navigation.navigate(location.href, { history: 'replace', state, info: { path, mergeObject, newValue, guid } });
+            const hashSplit = location.href.split('#');
+            const newHash = hashit.stringify('currentEntry', state);
+            navigation.navigate(hashSplit[0] + '#' + newHash, { history: 'replace', state, info: { path, mergeObject, newValue, guid } });
         });
     }
 }

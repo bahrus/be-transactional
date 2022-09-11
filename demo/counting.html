@@ -14,6 +14,9 @@
         }
     }'>Count</button>
 
+    <span be-current='{
+        "textContent": "a.b.c"
+    }'></span>
     <script type=importmap>
         {
             "imports": {
@@ -22,13 +25,16 @@
                 "be-decorated/": "../node_modules/be-decorated/",
                 "be-hive/": "../node_modules/be-hive/",
                 "be-observant/": "../node_modules/be-observant/",
-                "be-counted/": "../node_modules/be-counted/"
+                "be-counted/": "../node_modules/be-counted/",
+                "be-current/": "../node_modules/be-current/",
+                "be-transactional/": "../"
             }
         }
     </script>
     <script type=module>
-        import '../be-transactional.js';
+        import 'be-transactional/be-transactional.js';
         import 'be-counted/be-counted.js';
+        import 'be-current/be-current.js';
     </script>
 </body>
 </html>

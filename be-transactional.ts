@@ -3,9 +3,24 @@ import {VirtualProps, BeTransactionalActions, ProxyProps, Proxy, ITransactionalP
 import {register} from 'be-hive/register.js';
 import {Navigation} from './navigation_api';
 import { IMinimalNotify } from 'trans-render/lib/types';
+import {Hashit} from 'trans-render/lib/Hashit.js';
 
-const guid = '3a61e61d-6d36-4f7a-923d-baf3655def2c';
+const guidLHS = '3a61e61d-6d36-4f';
+const guidRHS = '7a-923d-baf3655def2c';
+const guid = guidLHS + guidRHS;
 const navigation = (<any>window).navigation as Navigation;
+
+const hashit = new Hashit(guidLHS, guidRHS);
+
+
+
+if(navigation.currentEntry?.getState() === undefined){
+    const state = hashit.parse('currentEntry');
+    if(state !== null){
+        navigation.updateCurrentEntry({state});
+    }
+}
+
 navigation.addEventListener('navigate', navigateEvent => {
     if((<any>navigateEvent?.info)?.guid === guid){
         navigateEvent.intercept({
@@ -89,7 +104,9 @@ export class BeTransactionalController implements BeTransactionalActions{
 
             //https://developer.chrome.com/docs/web-platform/navigation-api/#setting-state
 
-            navigation.navigate(location.href, {history: 'replace', state, info:{path, mergeObject, newValue, guid}})
+            const hashSplit = location.href.split('#');
+            const newHash = hashit.stringify('currentEntry', state);
+            navigation.navigate(hashSplit[0] + '#' + newHash, {history: 'replace', state, info:{path, mergeObject, newValue, guid}})
         });
     }
 

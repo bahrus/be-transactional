@@ -16,7 +16,7 @@
     "./be-transactional.js": "./be-transactional.js"
   },
   "dependencies": {
-    "trans-render": "0.0.596",
+    "trans-render": "0.0.600",
     "be-decorated": "0.0.155",
     "be-hive": "0.0.63"
   },
@@ -24,7 +24,8 @@
     "may-it-serve": "0.0.2",
     "@skypack/package-check": "0.2.2",
     "@custom-elements-manifest/analyzer": "0.6.4",
-    "be-counted": "0.0.1"
+    "be-counted": "0.0.1",
+    "be-current": "0.0.1"
   },
   "files": [
     "*.*"

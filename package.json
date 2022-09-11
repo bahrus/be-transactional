@@ -6,9 +6,7 @@
     "web-component",
     "custom-element",
     "custom-elements",
-    "JSON",
-    "bind",
-    "observe"
+    "navigation-api"
   ],
   "description": "Use appHistory as a trade blotter, providing a kind of global state unifier across components.",
   "main": "be-transactional.js",
@@ -18,7 +16,7 @@
     "./be-transactional.js": "./be-transactional.js"
   },
   "dependencies": {
-    "trans-render": "0.0.595",
+    "trans-render": "0.0.596",
     "be-decorated": "0.0.155",
     "be-hive": "0.0.63"
   },

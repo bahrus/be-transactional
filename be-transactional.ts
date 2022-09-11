@@ -80,9 +80,7 @@ export class BeTransactionalController implements BeTransactionalActions{
             const {mergeDeep} = await import('trans-render/lib/mergeDeep.js');
             const state = mergeDeep(current, objToMerge);
             //https://developer.chrome.com/docs/web-platform/navigation-api/#setting-state
-            navigation.updateCurrentEntry({state, info: {mergedObject: objToMerge, path, newValue}});
-            
-            
+            navigation.updateCurrentEntry({state});
         });
     }
 

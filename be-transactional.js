@@ -1,5 +1,7 @@
 import { define } from 'be-decorated/be-decorated.js';
 import { register } from 'be-hive/register.js';
+const guid = '3a61e61d-6d36-4f7a-923d-baf3655def2c';
+//declare function requestIdleCallback(callback: () => void): void;
 export class BeTransactionalController {
     #controllers = [];
     async intro(proxy, target, beDecorProps) {
@@ -55,8 +57,8 @@ export class BeTransactionalController {
             const aWin = window;
             const navigation = aWin.navigation;
             const current = navigation.currentEntry?.getState() || {};
-            const objToMerge = {};
-            let cursor = objToMerge;
+            const mergeObject = {};
+            let cursor = mergeObject;
             const split = path.split('.');
             for (let i = 0, ii = split.length; i < ii; i++) {
                 if (i === ii - 1) {
@@ -69,7 +71,12 @@ export class BeTransactionalController {
                 }
             }
             const { mergeDeep } = await import('trans-render/lib/mergeDeep.js');
-            const state = mergeDeep(current, objToMerge);
+            const state = mergeDeep(current, mergeObject);
+            state[guid] = {
+                path,
+                mergeObject,
+                newValue,
+            }; //sigh
             //https://developer.chrome.com/docs/web-platform/navigation-api/#setting-state
             navigation.updateCurrentEntry({ state });
         });

@@ -4,8 +4,9 @@ import {register} from 'be-hive/register.js';
 import {Navigation} from './navigation_api';
 import { IMinimalNotify } from 'trans-render/lib/types';
 
+const guid = '3a61e61d-6d36-4f7a-923d-baf3655def2c';
 
-declare function requestIdleCallback(callback: () => void): void;
+//declare function requestIdleCallback(callback: () => void): void;
 
 export class BeTransactionalController implements BeTransactionalActions{
     #controllers: AbortController[] = [];
@@ -65,8 +66,8 @@ export class BeTransactionalController implements BeTransactionalActions{
             const aWin = window as any;
             const navigation = aWin.navigation as Navigation;
             const current = navigation.currentEntry?.getState() || {} as any;
-            const objToMerge = {} as any;
-            let cursor = objToMerge;
+            const mergeObject = {} as any;
+            let cursor = mergeObject;
             const split = path.split('.');
             for(let i = 0, ii = split.length; i < ii; i++){
                 if(i === ii - 1){
@@ -78,7 +79,12 @@ export class BeTransactionalController implements BeTransactionalActions{
                 }
             }
             const {mergeDeep} = await import('trans-render/lib/mergeDeep.js');
-            const state = mergeDeep(current, objToMerge);
+            const state = mergeDeep(current, mergeObject);
+            state[guid] = {
+                path,
+                mergeObject,
+                newValue,
+            }; //sigh
             //https://developer.chrome.com/docs/web-platform/navigation-api/#setting-state
             navigation.updateCurrentEntry({state});
         });

@@ -20,7 +20,9 @@ is shorthand for:
 
 ...
 <cotus-potus be-current='{
-    "with": "cotus.house.impeachmentCount",
-    "set": "impeachmentCount"
+    "impeachmentCount": "cotus.house.impeachmentCount"
 }'></cotus-potus>
 ```
+
+[polyfill](https://www.npmjs.com/package/navigation-polyfill)
+[guide](https://developer.chrome.com/docs/web-platform/navigation-api)

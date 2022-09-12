@@ -5,7 +5,12 @@ Use the Navigation API as a "trade blotter", providing a kind of global state un
 ```html
 <cotus-house be-transactional='{
     "impeachmentCount:onSet": "cotus.house.impeachmentCount"
-}'cotus.house.impeachmentCount></cotus-house>
+}'></cotus-house>
+
+...
+<cotus-potus be-current='{
+    "impeachmentCount": "cotus.house.impeachmentCount"
+}'></cotus-potus>
 ```
 
 is shorthand for:

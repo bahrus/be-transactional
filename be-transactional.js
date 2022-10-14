@@ -1,4 +1,4 @@
-import { define } from 'be-decorated/be-decorated.js';
+import { define } from 'be-decorated/DE.js';
 import { register } from 'be-hive/register.js';
 import { Hashit } from 'trans-render/lib/Hashit.js';
 const guidLHS = '3a61e61d-6d36-4f';

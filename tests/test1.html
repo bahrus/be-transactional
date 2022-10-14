@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <button id=btn be-counted be-transactional='{
+        "be-decorated.counted.value-changed": {
+            "path": "a.b.c", 
+            "vft": "beDecorated.counted.value"
+        }
+    }'>Count</button>
+
+    <span id=output be-current='{
+        "textContent": "a.b.c"
+    }'></span>
+    <div id=target></div>
+    <script type=importmap>
+        {
+            "imports": {
+                "trans-render/": "../node_modules/trans-render/",
+                "xtal-element/": "../node_modules/xtal-element/",
+                "be-decorated/": "../node_modules/be-decorated/",
+                "be-hive/": "../node_modules/be-hive/",
+                "be-observant/": "../node_modules/be-observant/",
+                "be-counted/": "../node_modules/be-counted/",
+                "be-current/": "../node_modules/be-current/",
+                "be-transactional/": "../"
+            }
+        }
+    </script>
+    <script type=module>
+        import 'be-transactional/be-transactional.js';
+        import 'be-counted/be-counted.js';
+        import 'be-current/be-current.js';
+    </script>
+    <script>
+        function runScript(){
+            btn.click();
+            setTimeout(() => {
+                if(output.textContent === '1'){
+                    target.setAttribute('mark', 'good');
+                }
+            }, 10); 
+        }
+        setTimeout(() => {
+            runScript();
+        }, 2000);
+    </script>
+</body>
+</html>

@@ -26,7 +26,7 @@
     "@playwright/test": "1.27.1",
     "@custom-elements-manifest/analyzer": "0.6.4",
     "be-counted": "0.0.7",
-    "be-current": "0.0.2"
+    "be-current": "0.0.3"
   },
   "files": [
     "*.*"

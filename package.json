@@ -16,17 +16,17 @@
     "./be-transactional.js": "./be-transactional.js"
   },
   "dependencies": {
-    "trans-render": "0.0.625",
-    "be-decorated": "0.0.172",
-    "be-hive": "0.0.73"
+    "trans-render": "0.0.628",
+    "be-decorated": "0.0.182",
+    "be-hive": "0.0.76"
   },
   "devDependencies": {
     "may-it-serve": "0.0.3",
     "@skypack/package-check": "0.2.2",
     "@playwright/test": "1.27.1",
     "@custom-elements-manifest/analyzer": "0.6.4",
-    "be-counted": "0.0.6",
-    "be-current": "0.0.1"
+    "be-counted": "0.0.7",
+    "be-current": "0.0.2"
   },
   "files": [
     "*.*"

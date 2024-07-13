@@ -1,4 +1,4 @@
-# be-transactional
+# be-transactional (💱)
 
 Use the Navigation API as a "trade blotter", providing a kind of global state unifier across components.
 
